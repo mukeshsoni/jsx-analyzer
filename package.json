@@ -1,6 +1,6 @@
 {
   "name": "jsx-analyzer",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Analyze jsx string and give back useful data as javascript objects",
   "main": "index.js",
   "scripts": {

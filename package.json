@@ -1,0 +1,34 @@
+{
+  "name": "jsx-analyzer",
+  "version": "1.0.0",
+  "description": "Analyze jsx string and give back useful data as javascript objects",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mukeshsoni/jsx-analyzer.git"
+  },
+  "keywords": [
+    "jsx",
+    "analysis",
+    "ast",
+    "props"
+  ],
+  "author": "Mukesh Soni <mukeshsoni@gmail.com> (http://unstack.in/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mukeshsoni/jsx-analyzer/issues"
+  },
+  "homepage": "https://github.com/mukeshsoni/jsx-analyzer#readme",
+  "devDependencies": {
+    "babel-preset-es2015": "6.24.1",
+    "babel-preset-react": "6.24.1",
+    "jest": "21.2.1"
+  },
+  "dependencies": {
+    "babylon": "6.18.0"
+  }
+}

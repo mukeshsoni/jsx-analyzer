@@ -54,7 +54,7 @@ export function getVariableDeclarationString(node) {
                 return (
                     declaration.id.name +
                     ' = ' +
-                    getPropValueFromAstNode(declaration.init)
+                    getFunctionArg(declaration.init)
                 )
             })
             .join(', ')
@@ -104,6 +104,7 @@ function getFunctionBlockStatementString(node) {
                 case 'IfStatement':
                     return getIfStatementString(stmt)
                 case 'EmptyStatement':
+                    console.log('empty statement', stmt)
                     return ''
                 default:
                     console.log(

@@ -25,16 +25,22 @@ function getArrayValueFromAstNode(node) {
 
 const getFunctionParamName = prop.bind(null, 'name')
 
+function getFunctionArg(node) {
+    switch (node.type) {
+        case 'Identifier':
+            return node.name
+        default:
+            return JSON.stringify(getPropValueFromAstNode(node))
+    }
+}
+
 function getStringForExpressionStatement(node) {
     return (
         node.callee.object.name +
         '.' +
         node.callee.property.name +
         '(' +
-        node.arguments
-            .map(getPropValueFromAstNode)
-            .map(JSON.stringify)
-            .join(',') +
+        node.arguments.map(getFunctionArg).join(', ') +
         ')'
     )
 }
@@ -50,6 +56,8 @@ function getFunctionValueFromAstNode(node) {
             switch (stmt.type) {
                 case 'ExpressionStatement':
                     return getStringForExpressionStatement(stmt.expression)
+                case 'ReturnStatement':
+                    return 'return ' + getFunctionArg(stmt.argument)
                 default:
                     return (
                         'Could not get string for this statement type: ' +

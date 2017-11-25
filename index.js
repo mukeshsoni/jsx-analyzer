@@ -45,12 +45,27 @@ function getStringForExpressionStatement(node) {
     )
 }
 
+export function getVariableDeclarationString(node) {
+    return (
+        node.kind +
+        ' ' +
+        node.declarations
+            .map(declaration => {
+                return (
+                    declaration.id.name +
+                    ' = ' +
+                    getPropValueFromAstNode(declaration.init)
+                )
+            })
+            .join(', ')
+    )
+}
+
 function getFunctionValueFromAstNode(node) {
     let start = 'function('
 
     let params = node.params.map(getFunctionParamName)
 
-    // let bodyString = "return 1;"
     let bodyString = node.body.body
         .map(stmt => {
             switch (stmt.type) {
@@ -58,15 +73,21 @@ function getFunctionValueFromAstNode(node) {
                     return getStringForExpressionStatement(stmt.expression)
                 case 'ReturnStatement':
                     return 'return ' + getFunctionArg(stmt.argument)
+                case 'VariableDeclaration':
+                    return getVariableDeclarationString(stmt)
                 default:
+                    console.error(
+                        'Could not get string for this statement type: ',
+                        stmt
+                    )
                     return (
-                        'Could not get string for this statement type: ' +
-                        stmt.type
+                        'Could not get string for this statement type: ' + stmt
                     )
             }
         })
         .join(';\n')
 
+    console.log('bodyString', bodyString)
     return new Function(...params.concat(bodyString))
 }
 

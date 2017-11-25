@@ -61,12 +61,38 @@ export function getVariableDeclarationString(node) {
     )
 }
 
-function getFunctionValueFromAstNode(node) {
-    let start = 'function('
+function getPredicate(node) {
+    return (
+        getFunctionArg(node.left) +
+        ' ' +
+        node.operator +
+        ' ' +
+        getFunctionArg(node.right)
+    )
+}
 
-    let params = node.params.map(getFunctionParamName)
+function getIfStatementString(node) {
+    let s1 = 'if('
+    let s2 = getPredicate(node.test)
+    let s3 = ') { '
+    let s4 = getFunctionBlockStatementString(node.consequent)
+    let s5 = '}'
 
-    let bodyString = node.body.body
+    let ifPart = s1 + s2 + s3 + s4 + s5
+
+    if (node.alternate) {
+        let s6 = ' else {'
+        let s7 = getFunctionBlockStatementString(node.alternate)
+        let s8 = '}'
+        let elsePart = s6 + s7 + s8
+        return ifPart + elsePart
+    } else {
+        return ifPart
+    }
+}
+
+function getFunctionBlockStatementString(node) {
+    let bodyString = node.body
         .map(stmt => {
             switch (stmt.type) {
                 case 'ExpressionStatement':
@@ -75,19 +101,33 @@ function getFunctionValueFromAstNode(node) {
                     return 'return ' + getFunctionArg(stmt.argument)
                 case 'VariableDeclaration':
                     return getVariableDeclarationString(stmt)
+                case 'IfStatement':
+                    return getIfStatementString(stmt)
+                case 'EmptyStatement':
+                    return ''
                 default:
-                    console.error(
-                        'Could not get string for this statement type: ',
-                        stmt
+                    console.log(
+                        'could not take care of block statement',
+                        stmt,
+                        stmt.type
                     )
                     return (
-                        'Could not get string for this statement type: ' + stmt
+                        'Could not get string for this statement type: ' +
+                        stmt.type
                     )
             }
         })
         .join(';\n')
 
-    console.log('bodyString', bodyString)
+    return bodyString
+}
+
+function getFunctionValueFromAstNode(node) {
+    let start = 'function('
+
+    let params = node.params.map(getFunctionParamName)
+    let bodyString = getFunctionBlockStatementString(node.body)
+
     return new Function(...params.concat(bodyString))
 }
 
@@ -102,6 +142,8 @@ function getPropValueFromAstNode(node) {
     switch (nodeValue.type) {
         case 'StringLiteral':
             return getStringValueFromAstNode(nodeValue)
+        case 'BooleanLiteral':
+            return nodeValue.value
         case 'ObjectExpression':
             return getObjectValueFromAstNode(nodeValue)
         case 'ArrayExpression':

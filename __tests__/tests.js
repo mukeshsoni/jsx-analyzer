@@ -152,7 +152,7 @@ describe('asd', () => {
 
         it('should get jsx function prop value with assignment statement', () => {
             let jsxCode =
-                '<div name="someone" onClick={function(event, index) {let a = 1; console.log("clicked", 1, index); return 2;}}></div>'
+                '<div name="someone" onClick={function(event, index) {let a = 1, b = 2; console.log("clicked", 1, index); return 2;}}></div>'
             let expectedProps = {
                 name: 'someone',
                 onClick: function(event, index) {
@@ -162,7 +162,51 @@ describe('asd', () => {
             let expectedOnClickString = new Function(
                 'event',
                 'index',
-                'let a = 1;\nconsole.log("clicked", 1, index);\nreturn 2'
+                'let a = 1, b = 2;\nconsole.log("clicked", 1, index);\nreturn 2'
+            ).toString()
+
+            let props = getPropsFromJsxCode(jsxCode)
+            expect(props.name).toEqual(expectedProps.name)
+            expect(typeof props.onClick).toBe('function')
+            expect(props.onClick.length).toBe(2)
+            expect(props.onClick.toString()).toEqual(expectedOnClickString)
+        })
+
+        it('should get jsx function prop value which has if condition blocks', () => {
+            let jsxCode =
+                '<div name="someone" onClick={function(event, index) {if(index === 1) { return 2; } \n return "something"; }}></div>'
+            let expectedProps = {
+                name: 'someone',
+                onClick: function(event, index) {
+                    console.log('clicked')
+                }
+            }
+            let expectedOnClickString = new Function(
+                'event',
+                'index',
+                'if(index === 1) { return 2};\nreturn "something"'
+            ).toString()
+
+            let props = getPropsFromJsxCode(jsxCode)
+            expect(props.name).toEqual(expectedProps.name)
+            expect(typeof props.onClick).toBe('function')
+            expect(props.onClick.length).toBe(2)
+            expect(props.onClick.toString()).toEqual(expectedOnClickString)
+        })
+
+        it('should get jsx function prop value which has if-else condition blocks', () => {
+            let jsxCode =
+                '<div name="someone" onClick={function(event, index) {if(index === 1) { return 2; } else { return 3; } \n return "something"; }}></div>'
+            let expectedProps = {
+                name: 'someone',
+                onClick: function(event, index) {
+                    console.log('clicked')
+                }
+            }
+            let expectedOnClickString = new Function(
+                'event',
+                'index',
+                'if(index === 1) { return 2} else {return 3};\nreturn "something"'
             ).toString()
 
             let props = getPropsFromJsxCode(jsxCode)

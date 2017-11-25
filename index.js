@@ -1,5 +1,9 @@
 import * as babylon from 'babylon'
 
+function prop(propName, obj) {
+    return obj[propName]
+}
+
 function getStringValueFromAstNode(node) {
     return node.value
 }
@@ -19,8 +23,43 @@ function getArrayValueFromAstNode(node) {
     })
 }
 
+const getFunctionParamName = prop.bind(null, 'name')
+
+function getStringForExpressionStatement(node) {
+    return (
+        node.callee.object.name +
+        '.' +
+        node.callee.property.name +
+        '(' +
+        node.arguments
+            .map(getPropValueFromAstNode)
+            .map(JSON.stringify)
+            .join(',') +
+        ')'
+    )
+}
+
 function getFunctionValueFromAstNode(node) {
-    return 'TODO - should show the function body'
+    let start = 'function('
+
+    let params = node.params.map(getFunctionParamName)
+
+    // let bodyString = "return 1;"
+    let bodyString = node.body.body
+        .map(stmt => {
+            switch (stmt.type) {
+                case 'ExpressionStatement':
+                    return getStringForExpressionStatement(stmt.expression)
+                default:
+                    return (
+                        'Could not get string for this statement type: ' +
+                        stmt.type
+                    )
+            }
+        })
+        .join(';\n')
+
+    return new Function(...params.concat(bodyString))
 }
 
 function getPropValueFromAstNode(node) {

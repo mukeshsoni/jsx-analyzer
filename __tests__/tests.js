@@ -85,11 +85,23 @@ describe('asd', () => {
 
     it('should get jsx function prop value', () => {
         let jsxCode =
-            '<div name="someone" onClick={function() {console.log("clicked")}}></div>'
+            '<div name="someone" onClick={function(event, index) {console.log("clicked")}}></div>'
         let expectedProps = {
-            name: 'someone'
+            name: 'someone',
+            onClick: function(event, index) {
+                console.log('clicked')
+            }
         }
+        let expectedOnClickString = new Function(
+            'event',
+            'index',
+            'console.log("clicked")'
+        ).toString()
 
-        expect(getPropsFromJsxCode(jsxCode)).toEqual(expectedProps)
+        let props = getPropsFromJsxCode(jsxCode)
+        expect(props.name).toEqual(expectedProps.name)
+        expect(typeof props.onClick).toBe('function')
+        expect(props.onClick.length).toBe(2)
+        expect(props.onClick.toString()).toEqual(expectedOnClickString)
     })
 })

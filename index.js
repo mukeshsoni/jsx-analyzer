@@ -25,7 +25,7 @@ function getArrayValueFromAstNode(node) {
 
 const getFunctionParamName = prop.bind(null, 'name')
 
-function getFunctionArg(node) {
+function getAstNodeValueString(node) {
     switch (node.type) {
         case 'Identifier':
             return node.name
@@ -40,7 +40,7 @@ function getStringForExpressionStatement(node) {
         '.' +
         node.callee.property.name +
         '(' +
-        node.arguments.map(getFunctionArg).join(', ') +
+        node.arguments.map(getAstNodeValueString).join(', ') +
         ')'
     )
 }
@@ -54,7 +54,7 @@ export function getVariableDeclarationString(node) {
                 return (
                     declaration.id.name +
                     ' = ' +
-                    getFunctionArg(declaration.init)
+                    getAstNodeValueString(declaration.init)
                 )
             })
             .join(', ')
@@ -63,11 +63,11 @@ export function getVariableDeclarationString(node) {
 
 function getPredicate(node) {
     return (
-        getFunctionArg(node.left) +
+        getAstNodeValueString(node.left) +
         ' ' +
         node.operator +
         ' ' +
-        getFunctionArg(node.right)
+        getAstNodeValueString(node.right)
     )
 }
 
@@ -98,7 +98,7 @@ function getFunctionBlockStatementString(node) {
                 case 'ExpressionStatement':
                     return getStringForExpressionStatement(stmt.expression)
                 case 'ReturnStatement':
-                    return 'return ' + getFunctionArg(stmt.argument)
+                    return 'return ' + getAstNodeValueString(stmt.argument)
                 case 'VariableDeclaration':
                     return getVariableDeclarationString(stmt)
                 case 'IfStatement':
